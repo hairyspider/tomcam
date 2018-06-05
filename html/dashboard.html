@@ -1,0 +1,213 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Greenhouse</title>
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="style.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js" integrity="sha256-ABVkpwb9K9PxubvRrHMkk6wmWcIHUE9eBxNZLXYQ84k=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.js" integrity="sha256-t3+U9BqykoMN9cqZmJ5Z53TvPv4V7S9AmjUcIWNNyxo=" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <div id="current">
+            <a href="#" id="prev">Prev</a>
+            <img id="scroller" src="current.jpg" alt="Current view of the greenhouse" />
+            <a href="#" id="next">Next</a>
+<script type="text/javascript">
+    var prev = document.getElementById("prev");
+    
+    var next = document.getElementById("next");
+                
+                
+                
+                var xmlhttpevt = new XMLHttpRequest();           
+                xmlhttpevt.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        var myObj = JSON.parse(this.responseText);
+                        myObj.data.forEach(addEvt);
+                       
+                    }
+                }
+                
+                xmlhttpevt.open("GET", "events.php", true);
+                xmlhttpevt.send();
+</script>
+        </div>
+        <div id="graph">
+            Temperature and Pressure graph
+        <canvas id="myChart" width="100%"></canvas>
+<script type="text/javascript">
+    /* load the data for the graphs*/
+    var timeFormat = 'MM/DD/YYYY HH:mm';
+    var data = {};
+    
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var myObj = JSON.parse(this.responseText);
+            console.log(myObj.requestTime)
+            dates=[];
+            temps=[];
+            moist=[];
+            
+            data.dates = dates;
+            data.temps = temps;
+            data.moist = moist;
+            
+            for (i in myObj.data)
+                {
+                    dates.push(moment(myObj.data[i].time));
+                    temps.push(myObj.data[i].t);
+                    moist.push(myObj.data[i].m)
+                    
+                }
+            
+            var config = {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: "Temperature",
+                        yAxisID: 'T',
+                        backgroundColor: "rgb(255, 99, 132)",
+                        borderColor: "rgb(255, 99, 132)",
+                        fill: false,
+                        data: temps,
+                    }, {
+                        label: "Moisture",
+                        yAxisID: 'H',
+                        backgroundColor: "blue",
+                        borderColor: "blue",
+                        fill: false,
+                        data: moist,
+                    }]
+                },
+                options: {
+                    title:{
+                        text: "Chart.js Time Scale"
+                    },
+                    scales: {
+                        xAxes: [{
+                            type: "time",
+                            time: {
+                                parser: timeFormat,
+                                // round: 'day'
+                                tooltipFormat: 'll HH:mm'
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Date'
+                            }
+                        }, ],
+                        yAxes: [{
+                            id:"H",
+                            type:'linear',
+                            position:'right',
+                            ticks: {suggestedMin:650, suggestedMax:750},
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Moisture'
+                            }
+                        },{
+                            id:"T",
+                            type:'linear',
+                            position:'left',
+                            ticks: {suggestedMin:10},
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Temperature'
+                            }
+                        }
+                        ]
+                    },
+                }
+            };
+            
+            
+			var ctx = document.getElementById("myChart").getContext("2d");
+			window.myLine = new Chart(ctx, config);
+        }
+    };
+    xmlhttp.open("GET", "sensors.php", true);
+    xmlhttp.send();
+    
+    
+		
+
+            </script>
+        </div>
+        <div id="settings">
+            <fieldset>
+                <legend>Settings</legend>
+                <form method="post" action="settings.php">
+                <label for="temp_action">Temperature threshold</label>
+                <input id="temp_action" type="number" min="10" max="35" name="temp_action" required/>
+                <label for="fan_duration">Fan Duration (mins)</label>
+                <input id="fan_duration" type="number" min="0" max="10" name="fan_duration" required />
+                
+                <label for="moist_action">Soil threshold</label>
+                <input id="moist_action" type="number" min="500" max="1000" step="50" name="moist_action" required />
+                <label for="water_duration">Water Duration (mins)</label>
+                <input id="water_duration" type="number" min="0" max="5" name="water_duration" required />
+                    <input type="submit" value="Update" />
+                </form>
+                <script type="text/javascript">
+                var xmlsettings = new XMLHttpRequest();
+                xmlsettings.onreadystatechange = function()
+                {
+                    if (this.readyState == 4 && this.status==200){
+                        var s = JSON.parse(this.responseText);
+                        document.getElementById("temp_action").value=s["temp"];
+                        document.getElementById("fan_duration").value=s["fan"];
+                        document.getElementById("moist_action").value=s["moist"];
+                        document.getElementById("water_duration").value=s["water"];
+                    }
+                }
+                
+                xmlsettings.open("GET", "settings.php", true);
+                xmlsettings.send();
+                </script>
+            </fieldset>
+        </div>
+        <div id="events">
+            <table id="log">
+                <thead><tr><th>date</th><th>description</th><th>source</th></tr></thead>
+                
+            </table>
+            
+            <script type="text/javascript">
+    var log = document.getElementById("log");
+    
+    function addTD(t){
+        td=document.createElement("td");
+        td.innerHTML=t;
+        return td;
+    }
+                
+    function addEvt(e, i, l){
+        tr = document.createElement("tr");
+        tr.appendChild(addTD(e.t));
+        tr.appendChild(addTD(e.d));
+        tr.appendChild(addTD(e.n));
+        log.appendChild(tr);
+    }
+    
+    var xmlhttpevt = new XMLHttpRequest();           
+    xmlhttpevt.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var myObj = JSON.parse(this.responseText);
+            myObj.data.forEach(addEvt);
+           
+        }
+    }
+    
+    xmlhttpevt.open("GET", "events.php", true);
+    xmlhttpevt.send();
+            </script>
+        </div>
+        <div>
+        <video controls >
+            <source src="/img/out.mp4">
+        </video>
+        </div>
+    </body>
+</html>

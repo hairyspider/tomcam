@@ -13,23 +13,52 @@
             <img id="scroller" src="current.jpg" alt="Current view of the greenhouse" />
             <a href="#" id="next">Next</a>
 <script type="text/javascript">
-    var prev = document.getElementById("prev");
+    var imgList = new Array();
+    var img = document.getElementById("scroller");
+
+    function addImg(e, i, l)
+    {
+        imgList.push("/img/" + e.imagename);
+        img.currentImage = i;
+    }
+
+    function updateImage()
+    {
+        img.src = imgList[img.currentImage];
+    }
+    function prev()
+    {
+        if (img.currentImage==0)
+            img.currentImage = imgList.length;
+        else
+            img.currentImage = img.currentImage-1;
+        
+        updateImage();
+    }
+    function next()
+    {
+
+        if (img.currentImage==imgList.length)
+            img.currentImage = 0;
+        else
+            img.currentImage = img.currentImage+1;
+        updateImage();
+    }
+
+    var xmlhttpevt = new XMLHttpRequest();           
+    xmlhttpevt.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var myObj = JSON.parse(this.responseText);
+            myObj.data.forEach(addImg);
+            
+        }
+    }
     
-    var next = document.getElementById("next");
-                
-                
-                
-                var xmlhttpevt = new XMLHttpRequest();           
-                xmlhttpevt.onreadystatechange = function() {
-                    if (this.readyState == 4 && this.status == 200) {
-                        var myObj = JSON.parse(this.responseText);
-                        myObj.data.forEach(addEvt);
-                       
-                    }
-                }
-                
-                xmlhttpevt.open("GET", "events.php", true);
-                xmlhttpevt.send();
+    xmlhttpevt.open("GET", "imagex.php", true);
+    xmlhttpevt.send();
+    document.getElementById("prev").addEventListener("click", prev);
+    document.getElementById("next").addEventListener("click", next);
+    
 </script>
         </div>
         <div id="graph">

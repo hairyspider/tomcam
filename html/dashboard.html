@@ -37,7 +37,7 @@
     function next()
     {
 
-        if (img.currentImage==imgList.length)
+        if (img.currentImage==imgList.length-1)
             img.currentImage = 0;
         else
             img.currentImage = img.currentImage+1;
@@ -47,9 +47,10 @@
     var xmlhttpevt = new XMLHttpRequest();           
     xmlhttpevt.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
-            var myObj = JSON.parse(this.responseText);
-            myObj.data.forEach(addImg);
+            var list = JSON.parse(this.responseText);
             
+            list.forEach(addImg);
+            imgList.sort();
         }
     }
     

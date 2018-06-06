@@ -18,20 +18,27 @@
 <script type="text/javascript">
     var imgList = new Array();
     var img = document.getElementById("scroller");
+    var loader = document.createElement("div");
+    loader.style.display="none";
+
+    document.getElementById("current").appendChild(loader)
+    loader.innerText="loading....";
+
     function addImg(e, i, l)
     {
         imgList.push("/img/" + e.imagename);
-        img.currentImage = i;
+        img.currentImage = i-1;
     }
 
     function updateImage()
     {
+        showloader();
         img.src = imgList[img.currentImage];
     }
     function prev()
     {
         if (img.currentImage==0)
-            img.currentImage = imgList.length;
+            img.currentImage = imgList.length-1;
         else
             img.currentImage = img.currentImage-1;
         
@@ -47,20 +54,32 @@
         updateImage();
     }
 
+    function showloader(){
+        
+        console.log("showing loader screen");
+        loader.style.display="block";
+
+    }
+    function hideloader()
+    {
+        console.log("hiding loader screen");
+        loader.style.display="none"; 
+    }
     var xmlhttpevt = new XMLHttpRequest();           
     xmlhttpevt.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             var list = JSON.parse(this.responseText);
             
-            list.forEach(addImg);
+            list.forEach(addImg); 
             imgList.sort();
-        }
+        } 
     }
     
     xmlhttpevt.open("GET", "imagex.php", true);
     xmlhttpevt.send();
     document.getElementById("prev").addEventListener("click", prev);
     document.getElementById("next").addEventListener("click", next);
+    img.addEventListener("load", hideloader )
     
 </script>
         </div>

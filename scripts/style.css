@@ -1,0 +1,42 @@
+
+body {
+    background-color: darkseagreen;
+    color:black;
+    font-family: "Open Sans", Helvetica, Arial, sans-serif;
+    
+    margin:0 auto; 
+    max-width:800px;
+}
+
+div {
+    background-color:floralwhite;
+    margin: 1em;
+    padding: 0.5em;
+    border-radius:6px;
+}
+
+img, video {
+    width:100%;
+    border-radius:6px;
+}
+
+th {
+    text-transform: capitalize;
+}
+
+#prev {
+    float:left;
+}
+#next{
+    float:right;
+}
+
+#log {
+    border:1px solid;
+    width:100%
+}
+
+#myChart {
+    background-color:white;
+    border-radius:6px;
+}

@@ -1,0 +1,14 @@
+{
+  "name": "scripts",
+  "version": "1.0.0",
+  "description": "nodejs implementation of the nature camera",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Rhys Jeremiah",
+  "license": "ISC",
+  "dependencies": {
+    "sqlite3": "^4.0.0"
+  }
+}

@@ -25,9 +25,6 @@ class Status:
 OPT_FILE = "/opt/irrigation/settings.conf"
 	
 
-
-
-
 def LoadSettings():
 	cur_mod = os.path.getmtime(OPT_FILE)
 	if cur_mod!=Status.last_settings_file_time:
